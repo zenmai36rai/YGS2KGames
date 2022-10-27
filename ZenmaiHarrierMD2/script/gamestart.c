@@ -283,7 +283,7 @@ void ’e•\¦(int px, int py, int x,int y,int z){
 }
 
 void ‚a‚f•\¦(int bg,int x,int y){
-	Blt(bg,((x - 240) / 8) - 64,0);								//	‚P”Ô‚ÌƒvƒŒ[ƒ“‚ğ•\¦
+	Blt(bg,((-x + 240) / 8) - 64,0);								//	‚P”Ô‚ÌƒvƒŒ[ƒ“‚ğ•\¦
 }
 
 int ÚG”»’è(int x1,int y1,int x3,int y3,int z3){
