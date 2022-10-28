@@ -32,6 +32,7 @@ void main(){
 	vx = 0;	 vy = 0;						//	マイキャラの速度は０
 	j = 0;									//	はじめはジャンプしていない
 	isDead = 0;								//	最初は生きてる
+
 	for(i=0;i<10;i++) bb[i]=0;				//	全ブロック初期化
 	for(i=0;i<3;i++) tt[i]=0;				//	弾の初期化
 	for(i=0;i<3;i++) st[i]=0;				//	ショットの初期化
@@ -326,7 +327,7 @@ int ショット判定(int px, int py,int x1,int y1,int z1,int x3,int y3,int z3,int wi
 }
 
 void ゲームスタート表示(){
-	ＢＧ表示(1,0,0);
+	ＢＧ表示(1,240,0);
 	TextLayerOn(0,240,200);
 	TextSize(0,36);
 	TextOut(0,"push space\n");
