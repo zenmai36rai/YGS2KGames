@@ -6,6 +6,7 @@ void main(){
 	int bx[10],by[10],bz[10],bb[10];		//	敵キャラの座標と有効かどうかを保持するための変数
 	int wx[10],wy[10],wz[10],ww[10];		//	壁の座標
 	int gx[10],gy[10],gz[10],gg[10];		//	草の座標
+	int lx[10],ly[10],lz[10],ll[10];		//	ラインの座標
 	//	bb[n]が0ならば空き、1ならば横移動中。2ならば縦移動中、3ならば斜め移動を表す。
 	int tx[3],ty[3],tz[3],tvx[3],tvy[3],tvz[3],tt[3];
 	int sx[3],sy[3],sz[3],st[3];			//	ショット変数
@@ -30,8 +31,8 @@ void main(){
 	dragon = 50000;
 	x = 240; y= 400;						//	マイキャラの座標初期化
 	vx = 0;	 vy = 0;						//	マイキャラの速度は０
-	j = 0;									//	はじめはジャンプしていない
-	isDead = 0;								//	最初は生きてる
+	j = 0;								//	はじめはジャンプしていない
+	isDead = 0;							//	最初は生きてる
 
 	for(i=0;i<10;i++) bb[i]=0;				//	全ブロック初期化
 	for(i=0;i<3;i++) tt[i]=0;				//	弾の初期化
@@ -39,18 +40,21 @@ void main(){
 	for(i=0;i<10;i++) ee[i]=0;
 	for(i=0;i<10;i++) ww[i]=0;				//	壁初期化
 	for(i=0;i<10;i++) gg[i]=0;				//	草初期化
+	for(i=0;i<10;i++) ll[i]=0;				//	ライン初期化
 	
-
-	bx = 640; by = 400;						//	敵キャラの座標初期化
+	bx = 640; by = 400;					//	敵キャラの座標初期化
 	bg=1;
 	time=0;
 	loop {
 		time++;
-		ClearSecondary();					//	画面クリア
+		ClearSecondary();				//	画面クリア
 //		↑は、↓でＢＧを表示するので不要
 		ＢＧ表示(2,x,y);
 		// Z-orderが自分より奥のものを先に表示
 		for(zz = 480; zz>0; zz--){
+		//	if((ll[i] != 0) && (zz == lz[i])){
+		//		ライン表示(x,y,lx[i],ly[i],lz[i]);
+		//	}
 			for(i=0;i<3;i++) {
 				// ショット表示
 				if((st[i] != 0) && (sz[i] == zz)) {
@@ -140,8 +144,15 @@ void main(){
 				}
 			}
 		}
-
 		for(i=0;i<10;i++){
+		//	// ライン発生
+		//	if( ll[i]==0 ) {
+		//		// 1/100の確率でライン発生
+		//		if (Rand(80) == 0) ライン発生(&lx[i],&ly[i],&lz[i],&ll[i],time);
+		//	}
+		//	// ライン移動
+		//	lz[i] = lz[i] - 8;
+		//	if(lz[i] <= 60) { lz[i] = 30; ll[i]=0; }
 			if( ww[i]==0 ) {
 				// 1/100の確率で壁発生
 				if (Rand(100) == 0) 壁発生(&wx[i],&wy[i],&wz[i],&ww[i],time);
@@ -207,6 +218,7 @@ void 初期化処理(){
 	LoadBitmap("script/exp.bmp",6,1);		//	ドットの読み込み
 	LoadBitmap("script/wall.bmp",9,1);		//	壁画像の読み込み
 	LoadBitmap("script/glass.bmp",10,1);		//	草画像の読み込み
+	LoadBitmap("script/hline.bmp",11,1);		//	ライン画像の読み込み
 	LoadWave("script/hyupa2.wav",0);		//	ジャンプ音の読み込み
 	LoadWave("script/drop.wav",1);			//	落下音の読み込み
 	LoadWave("script/gucha.wav",2);			//	落下してつぶれたときの音
@@ -225,8 +237,8 @@ void 爆発表示(int px,int py,int x,int y,int z,int f){
 	if( z != 0 ) {
 		zoom = (120 << 16) / z;
 	}
-	xbuf = (x - (px-240)* zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
-	ybuf = (y * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	xbuf = ((x - (px-240))* zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
+	ybuf = ((y - (py-400)/2)* zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	BltRectR(6,xbuf,ybuf,0,(3 - f)*48,48,48,zoom,zoom);			//	０番のプレーンの(0,192)から48×48を表示
 }
 
@@ -234,9 +246,9 @@ void 迷路表示(int px, int py, int x, int y, int z){
 	int zoom,xbuf,ybuf;
 	zoom = (120 << 16) / z;
 	xbuf = ((x - (px -240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
-	ybuf = (y * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	ybuf = ((y - (py-400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	BltRectR(9,xbuf,ybuf,0,0,100,100, zoom, zoom);	//	０番のプレーンの(0,48+n*48)から48×48を表示
-	ybuf = (400 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	ybuf = (480 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	if(z < 320){BltRectR(0,xbuf,ybuf,0,288,48,48,zoom,zoom);}	//	影を表示
 }
 
@@ -244,8 +256,18 @@ void 草表示(int px, int py, int x, int y, int z){
 	int zoom,xbuf,ybuf;
 	zoom = (120 << 16) / z;
 	xbuf = ((x - (px -240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
-	ybuf = (480 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	ybuf = ((480 - (py-400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	BltRectR(10,xbuf,ybuf,0,0,128,128, zoom, zoom);	//	０番のプレーンの(0,48+n*48)から48×48を表示
+}
+
+void ライン表示(int px, int py, int x, int y, int z){
+	int zoom,xbuf,ybuf;
+	zoom = (120 << 16) / z;
+	xbuf = ((x - (px -240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
+	ybuf = ((224 - (py-400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	BltRectR(11,xbuf,ybuf,0,0,128,256, zoom, zoom);	//	０番のプレーンの(0,48+n*48)から48×48を表示
+	ybuf = (480 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	if(z < 320){BltRectR(0,xbuf,ybuf,0,288,48,48,zoom,zoom);}	//	影を表示
 }
 
 void マイキャラ表示(int x,int y){
@@ -266,9 +288,9 @@ void ブロック表示(int px, int py, int x,int y,int z,int n){
 	int zoom,xbuf,ybuf;
 	zoom = (120 << 16) / z;
 	xbuf = ((x - (px - 240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
-	ybuf = (y * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	ybuf = ((y - (py - 400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	BltRectR(0,xbuf,ybuf,0,n*48,48,48,65536 * 120 / z, 65536 * 120 / z);			//	０番のプレーンの(0,48+n*48)から48×48を表示
-	ybuf = (400 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	ybuf = (480 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	if ( z < 240 ) { BltRectR(0,xbuf,ybuf,0,288,48,48,zoom,zoom); }				//	影を表示
 }
 void 弾表示(int px, int py, int x,int y,int z){
@@ -278,13 +300,13 @@ void 弾表示(int px, int py, int x,int y,int z){
 		zoom = (120 << 16) / z;
 //		x = (x << 16 - (48 * zoom / 2)) >> 16;
 	}
-	xbuf = (x - (px - 240) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
-	ybuf = (y * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	xbuf = ((x - (px - 240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
+	ybuf = ((y - (py - 400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	BltRectR(0,xbuf,ybuf,0,192,48,48,zoom,zoom);			//	０番のプレーンの(0,192)から48×48を表示
 }
 
 void ＢＧ表示(int bg,int x,int y){
-	Blt(bg,((-x + 240) / 8) - 64,0);								//	１番のプレーンを表示
+	Blt(bg,((-x + 240) / 8) - 64, (y - 400) / 8 - 48);		//	１番のプレーンを表示
 }
 
 int 接触判定(int x1,int y1,int x3,int y3,int z3){
@@ -314,9 +336,9 @@ int ショット判定(int px, int py,int x1,int y1,int z1,int x3,int y3,int z3,int wi
 	int x2,x4,y2,y4,z2,z4, w1;
 	w1 = width - 2;
 	x2 = x1 + 36; y2 = y1 + 36; z2 = z1 + 36;	//　ショットの矩形領域  :(x1,y1)-(x2,y2)
-	x4 = x3 - px + 240 + w1; y4 = y3 + w1; z4 = z3 + w1;	//	ブロックの矩形領域:(x3,y3)-(x4,y4)
+	x4 = x3 - px + 240 + w1; y4 = y3 - (py - 400)/2 + w1; z4 = z3 + w1;	//	ブロックの矩形領域:(x3,y3)-(x4,y4)
 	x1 = x1 + 12; y1 = y1 + 12; z1 = z1 + 12;
-	x3 = x3 - px + 240 + 2; y3 = y3 + 2; z3 = z3 + 2;
+	x3 = x3 - px + 240 + 2; y3 = y3 - (py - 400)/2 + 2; z3 = z3 + 2;
 
 	if( (x1 < x4) && (x3 < x2) && (y1 < y4) && (y3 < y2) && (z1 < z4) && (z3 < z2)) {
 		//	当たり！
@@ -327,7 +349,7 @@ int ショット判定(int px, int py,int x1,int y1,int z1,int x3,int y3,int z3,int wi
 }
 
 void ゲームスタート表示(){
-	ＢＧ表示(1,240,0);
+	ＢＧ表示(1,240,400);
 	TextLayerOn(0,240,200);
 	TextSize(0,36);
 	TextOut(0,"push space\n");
@@ -437,7 +459,11 @@ void 壁発生(int* wx,int*wy,int*wz,int*ww,int time){
 }
 
 void 草発生(int* gx,int*gy,int*gz,int*gg,int time){
-	*gx = Rand(6) * 100; *gy = (Rand(2)+1)*100; *gz=480; *gg = 1;
+	*gx = Rand(100) * 6; *gy = (Rand(2)+1)*100; *gz=480; *gg = 1;
+}
+
+void ライン発生(int* lx,int*ly,int*lz,int*ll,int time){
+	*lx = Rand(100) * 6; *ly = (Rand(2)+1)*100; *lz=480; *ll = 1;
 }
 
 void 弾発生(int x,int y,int bx,int by,int bz,int* tx,int* ty,int* tz,int* tvx,int* tvy,int* tvz,int* tt){
