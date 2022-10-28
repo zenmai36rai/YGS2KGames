@@ -52,9 +52,9 @@ void main(){
 		ＢＧ表示(2,x,y);
 		// Z-orderが自分より奥のものを先に表示
 		for(zz = 480; zz>0; zz--){
-		//	if((ll[i] != 0) && (zz == lz[i])){
-		//		ライン表示(x,y,lx[i],ly[i],lz[i]);
-		//	}
+			if((ll[i] != 0) && (zz == lz[i])){
+				ライン表示(x,y,lx[i],ly[i],lz[i]);
+			}
 			for(i=0;i<3;i++) {
 				// ショット表示
 				if((st[i] != 0) && (sz[i] == zz)) {
@@ -104,7 +104,7 @@ void main(){
 		for(i=0;i<3;i++) {
 			for(ii=0;ii<10;ii++){
 				if(bb[ii]!=0) {
-					if (ショット判定(x,y,sx[i],sy[i],sz[i],bx[ii],by[ii],bz[ii],48)){
+					if (ショット判定(x,y,sx[i],sy[i],sz[i],bx[ii],by[ii],bz[ii],96)){
 						bb[ii] = 0;
 						st[i] = 0;
 						PlayWave(4);
@@ -129,6 +129,19 @@ void main(){
 						}
 					}
 				}
+				if(ll[ii]!=0) {
+					if (ショット判定(x,y,sx[i],sy[i],sz[i],lx[ii],ly[ii],lz[ii],100)){
+						ll[ii] = 0;
+						st[i] = 0;
+						PlayWave(4);
+						for(ei=0;ei<10;ei++){
+							ex[ei] = lx[ii];
+							ey[ei] = ly[ii];
+							ez[ei] = lz[ii];
+							ee[ei] = 3;
+						}
+					}
+				}
 			}
 		}
 		マイキャラ移動(&x,&y,&vx,&vy,&j);
@@ -145,14 +158,14 @@ void main(){
 			}
 		}
 		for(i=0;i<10;i++){
-		//	// ライン発生
-		//	if( ll[i]==0 ) {
-		//		// 1/100の確率でライン発生
-		//		if (Rand(80) == 0) ライン発生(&lx[i],&ly[i],&lz[i],&ll[i],time);
-		//	}
-		//	// ライン移動
-		//	lz[i] = lz[i] - 8;
-		//	if(lz[i] <= 60) { lz[i] = 30; ll[i]=0; }
+			// ライン発生
+			if( ll[i]==0 ) {
+				// 1/100の確率でライン発生
+				if (Rand(80) == 0) ライン発生(&lx[i],&ly[i],&lz[i],&ll[i],time);
+			}
+			// ライン移動
+			lz[i] = lz[i] - 8;
+			if(lz[i] <= 60) { lz[i] = 30; ll[i]=0; }
 			if( ww[i]==0 ) {
 				// 1/100の確率で壁発生
 				if (Rand(100) == 0) 壁発生(&wx[i],&wy[i],&wz[i],&ww[i],time);
@@ -239,7 +252,7 @@ void 爆発表示(int px,int py,int x,int y,int z,int f){
 	}
 	xbuf = ((x - (px-240))* zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
 	ybuf = ((y - (py-400)/2)* zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
-	BltRectR(6,xbuf,ybuf,0,(3 - f)*48,48,48,zoom,zoom);			//	０番のプレーンの(0,192)から48×48を表示
+	BltRectR(6,xbuf,ybuf,0,(3 - f)*48,48,48,zoom*2,zoom*2);			//	０番のプレーンの(0,192)から48×48を表示
 }
 
 void 迷路表示(int px, int py, int x, int y, int z){
@@ -264,8 +277,8 @@ void ライン表示(int px, int py, int x, int y, int z){
 	int zoom,xbuf,ybuf;
 	zoom = (120 << 16) / z;
 	xbuf = ((x - (px -240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
-	ybuf = ((224 - (py-400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
-	BltRectR(11,xbuf,ybuf,0,0,128,256, zoom, zoom);	//	０番のプレーンの(0,48+n*48)から48×48を表示
+	ybuf = ((96 - (py-400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
+	BltRectR(11,xbuf,ybuf,0,0,192,384, zoom, zoom);	//	０番のプレーンの(0,48+n*48)から48×48を表示
 	ybuf = (480 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
 	if(z < 320){BltRectR(0,xbuf,ybuf,0,288,48,48,zoom,zoom);}	//	影を表示
 }
@@ -289,9 +302,9 @@ void ブロック表示(int px, int py, int x,int y,int z,int n){
 	zoom = (120 << 16) / z;
 	xbuf = ((x - (px - 240)) * zoom) >> 16 + ((640 - ((640 * zoom) >> 16)) / 2);
 	ybuf = ((y - (py - 400) / 2) * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
-	BltRectR(0,xbuf,ybuf,0,n*48,48,48,65536 * 120 / z, 65536 * 120 / z);			//	０番のプレーンの(0,48+n*48)から48×48を表示
+	BltRectR(0,xbuf,ybuf,0,n*48,48,48,zoom*2, zoom*2);			//	０番のプレーンの(0,48+n*48)から48×48を表示
 	ybuf = (480 * zoom) >> 16 + ((480 - ((480 * zoom) >> 16)) / 2);
-	if ( z < 240 ) { BltRectR(0,xbuf,ybuf,0,288,48,48,zoom,zoom); }				//	影を表示
+	if ( z < 240 ) { BltRectR(0,xbuf,ybuf,0,288,48,48,zoom*2,zoom*2); }				//	影を表示
 }
 void 弾表示(int px, int py, int x,int y,int z){
 	int zoom,xbuf,ybuf;
@@ -448,7 +461,7 @@ void ブロック発生(int* bx,int* by,int* bz,int* bb,int time){
 	if(r == 0) r = 3;
 	alt {
 	case r==1: { *bx = Rand(15)*48; *by = Rand(8)*48; *bz=480; }
-	case r==2: { *bx = Rand(15)*48; *by = -48; *bz=160; PlayWave(1); }
+	case r==2: { *bx = Rand(15)*48; *by = -48; *bz=200 + Rand(80); PlayWave(1); }
 	case r==3: { *bx = Rand(15)*48+240; *by = -48; *bz=480; PlayWave(1); }
 	}
 	*bb = r;
