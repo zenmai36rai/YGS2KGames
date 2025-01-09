@@ -13,6 +13,8 @@ void main(){
 	int score;
 	int isDead;
 	int i;
+	int n;
+	int tail;
 	int bg;						//	背景の種類
 	int ii;
 	int dragon;					//	ドラゴンの出るスコア
@@ -166,9 +168,18 @@ void main(){
 			// ライン移動
 			lz[i] = lz[i] - 8;
 			if(lz[i] <= 60) { lz[i] = 30; ll[i]=0; }
-			if( ww[i]==0 ) {
+			if( ((i % 3) == 0) && ((ww[i]==0) && (ww[i+1]==0) &&(ww[i+2]==0) &&(ww[i+3]==0) &&(ww[i+4]==0))) {
 				// 1/100の確率で壁発生
-				if (Rand(100) == 0) 壁発生(&wx[i],&wy[i],&wz[i],&ww[i],time);
+				if (Rand(100) == 0) {
+					壁発生(&wx[i],&wy[i],&wz[i],&ww[i],time);
+					for(n=1;n<3;n++){
+						if(wx[i] < 120) { tail = 30; } else { tail = -30;}
+						wx[i+n] = wx[i] + (tail * n);
+						wy[i+n] = wy[i];
+						wz[i+n] = wz[i] + (60 * n);
+						ww[i+n] = ww[i];
+					}
+				}
 			}
 			if( gg[i]==0 ) {
 				// 1/100の確率で壁発生
