@@ -169,11 +169,11 @@ void main(){
 			lz[i] = lz[i] - 8;
 			if(lz[i] <= 60) { lz[i] = 30; ll[i]=0; }
 			if( ((i % 3) == 0) && ((ww[i]==0) && (ww[i+1]==0) &&(ww[i+2]==0) &&(ww[i+3]==0) &&(ww[i+4]==0))) {
-				// 1/100の確率で壁発生
-				if (Rand(100) == 0) {
+				// 1/60の確率で壁発生
+				if (Rand(60) == 0) {
 					壁発生(&wx[i],&wy[i],&wz[i],&ww[i],time);
 					for(n=1;n<3;n++){
-						if(wx[i] < 120) { tail = 30; } else { tail = -30;}
+						if(wx[i] < 120) { tail = 60; } else { tail = -60;}
 						wx[i+n] = wx[i] + (tail * n);
 						wy[i+n] = wy[i];
 						wz[i+n] = wz[i] + (60 * n);
@@ -182,7 +182,7 @@ void main(){
 				}
 			}
 			if( gg[i]==0 ) {
-				// 1/100の確率で壁発生
+				// 1/100の確率で草発生
 				if (Rand(100) == 0) 草発生(&gx[i],&gy[i],&gz[i],&gg[i],time);
 			}
 			// 壁移動
